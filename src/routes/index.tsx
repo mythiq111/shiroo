@@ -184,9 +184,9 @@ function useLaunchConfetti(canvasRef: React.RefObject<HTMLCanvasElement | null>)
 /* ═══════════════════════════════════════════════════
    POPUP SYSTEM
 ═══════════════════════════════════════════════════ */
-interface PopupProps { onConfetti: (x?: number) => void; }
+interface PopupProps { onConfetti: (x?: number) => void; onComplete: () => void; }
 
-function PopupSystem({ onConfetti }: PopupProps) {
+function PopupSystem({ onConfetti, onComplete }: PopupProps) {
   const [step, setStep] = useState<0 | 1 | 2>(0);
   const [visible, setVisible] = useState(false);
   const [pos, setPos] = useState({ x: 0, y: 0 });
@@ -265,8 +265,9 @@ function PopupSystem({ onConfetti }: PopupProps) {
     } else {
       setStep(0);
       setVisible(false);
+      onComplete();
     }
-  }, [step, vp, onConfetti]);
+  }, [step, vp, onConfetti, onComplete]);
 
   if (!visible || step === 0) return null;
   const data = POPUP_DATA[step];
@@ -411,6 +412,20 @@ function GallerySection() {
 function BirthdayApp() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const launch = useLaunchConfetti(canvasRef);
+  const [popupDone, setPopupDone] = useState(false);
+  const [polaroidSrc, setPolaroidSrc] = useState<string | null>(null);
+  const polaroidRef = useRef<HTMLInputElement>(null);
+
+  const handlePolaroidChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      setPolaroidSrc(ev.target?.result as string);
+      if (polaroidRef.current) polaroidRef.current.value = "";
+    };
+    reader.readAsDataURL(file);
+  };
 
   // ── Canvas sizing ──────────────────────────────────────────────────────────
   useEffect(() => {
@@ -471,19 +486,73 @@ function BirthdayApp() {
       <canvas ref={canvasRef} id="confetti-canvas" />
 
       {/* Best-friend popup chain */}
-      <PopupSystem onConfetti={launch} />
+      <PopupSystem onConfetti={launch} onComplete={() => setPopupDone(true)} />
+
+      {/* Everything below is invisible until both confirmations are done */}
+      <div style={{ opacity: popupDone ? 1 : 0, pointerEvents: popupDone ? "auto" : "none", transition: "opacity 1.2s ease", userSelect: popupDone ? "auto" : "none" }}>
 
       {/* ── HERO ─────────────────────────────────────────────────────────── */}
       <div className="hero">
-        <p className="hero-eyebrow">✦ a very special day for a very special soul (Athma)✦</p>
-        <span className="crown">👑</span>
-        <p className="hero-small">Happy Birthday</p>
-        <div className="hero-name">Shiroo</div>
-        <p className="hero-sub" >Janamadina Subhakanshalu 🐷</p>
-        <div className="petal-row">🌸 🌷 💜 ✨ 💜 🌷 🌸</div>
-        <div className="scroll-hint">
-          <span>scroll</span>
-          <div className="scroll-bar" />
+        {/* Left — existing content */}
+        <div className="hero-left">
+          <p className="hero-eyebrow">✦ a very special day for a very special soul (Athma) ✦</p>
+          <span className="crown">👑</span>
+          <p className="hero-small">Happy Birthday</p>
+          <div className="hero-name">Shiroo</div>
+          <p className="hero-sub">Janamadina Subhakanshalu 🐷</p>
+          <div className="petal-row">🌸 🌷 💜 ✨ 💜 🌷 🌸</div>
+          <div className="scroll-hint">
+            <span>scroll</span>
+            <div className="scroll-bar" />
+          </div>
+        </div>
+
+        {/* Right — polaroid card + balloons */}
+        <div className="hero-right">
+          <div className="hero-balloons" aria-hidden="true">
+            <span className="hb-balloon hb-b1">🎈</span>
+            <span className="hb-balloon hb-b2">🎈</span>
+            <span className="hb-balloon hb-b3">🎈</span>
+            <span className="hb-balloon hb-b4">🎀</span>
+            <span className="hb-balloon hb-b5">🎈</span>
+          </div>
+          <div className="polaroid-card">
+            <p className="polaroid-heading">Happy Birthday 🐱</p>
+            <div className="polaroid-tape pt-1" aria-hidden="true" />
+            <div className="polaroid-tape pt-2" aria-hidden="true" />
+            <div
+              className="polaroid-frame"
+              role="button"
+              tabIndex={0}
+              aria-label="Click to add a photo"
+              onClick={() => !polaroidSrc && polaroidRef.current?.click()}
+              onKeyDown={(e) => e.key === "Enter" && !polaroidSrc && polaroidRef.current?.click()}
+            >
+              {polaroidSrc ? (
+                <>
+                  <img src={polaroidSrc} alt="Birthday photo" className="polaroid-img" />
+                  <button
+                    className="polaroid-remove"
+                    aria-label="Remove photo"
+                    onClick={(e) => { e.stopPropagation(); setPolaroidSrc(null); }}
+                  >✕</button>
+                </>
+              ) : (
+                <div className="polaroid-empty">
+                  <span>📸</span>
+                  <span>tap to add a photo</span>
+                </div>
+              )}
+            </div>
+            <p className="polaroid-caption">To the best human ik... 💙</p>
+          </div>
+          <input
+            ref={polaroidRef}
+            type="file"
+            accept="image/*"
+            style={{ display: "none" }}
+            onChange={handlePolaroidChange}
+          />
         </div>
       </div>
 
@@ -572,6 +641,7 @@ function BirthdayApp() {
           🌸 🌷 💜 ✨ 💜 🌷 🌸
         </span>
       </footer>
+      </div>{/* /page-content wrapper */}
     </>
   );
 }

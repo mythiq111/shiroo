@@ -85,7 +85,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:title", content: "Happy Birthday Shirooo" },
-      { name: "twitter:description", content: "A cinematic birthday keepsake made with love." },
+      { name: "twitter:description", content: "A cinematic birthday keepsake made with love for Shirooo." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/f008f23e-5ea6-4c53-836e-f92f63df6f33/id-preview-3b472a46--baedba70-536e-4666-ab56-c0b7759f9a43.lovable.app-1781414114616.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/f008f23e-5ea6-4c53-836e-f92f63df6f33/id-preview-3b472a46--baedba70-536e-4666-ab56-c0b7759f9a43.lovable.app-1781414114616.png" },
     ],
     links: [
       {

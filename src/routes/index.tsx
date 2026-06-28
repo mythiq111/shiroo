@@ -40,9 +40,9 @@ const REASONS = [
   { emoji: "💫", title: "Bakka Pilla", desc: "Koncham Bakka Ga untav Untav diet cheyu lavvu avdhu kani " },
   { emoji: "🤗", title: "Warmest soul ever", desc: "Makes you feel seen, heard, and completely yourself. Every single time." },
   { emoji: "😂", title: "Funniest human alive", desc: "Turns any gloomy day into a full comedy special without even trying." },
-  { emoji: "💪", title: "Quietly unstoppable", desc: "Handles everything with grace and never lets anyone see the effort behind it." },
+  { emoji: "💪", title: "Quietly unstoppable", desc: "Handles everything with grace and never lets anyone see the effort behind it.(Appudu Apudu Tesnion padtadi anthey 😂)" },
   { emoji: "🎀", title: "Main character energy", desc: "Lives life like the protagonist of the most beautiful story ever written." },
-  { emoji: "💜", title: "Loyal to the core", desc: "Once she's your person, she's your person forever. That's rare and precious." },
+  { emoji: "💜", title: "Chitii Papa", desc: "Epudu Ellaney Happy ga undu Ok Chiroo..." },
 ];
 
 const WISHES = [
@@ -339,10 +339,14 @@ function AgeSection() {
 type Slot = { id: number; imgSrc: string | null; caption: string };
 
 function GallerySection() {
-  const [slots, setSlots] = useState<Slot[]>(() =>
-    Array.from({ length: 6 }, (_, i) => ({ id: i, imgSrc: null, caption: CAPTIONS[i % CAPTIONS.length] })),
-  );
-  const [nextId, setNextId] = useState(6);
+  const [slots, setSlots] = useState<Slot[]>(() => [
+    { id: 0, imgSrc: "https://res.cloudinary.com/dvf0ugwrr/image/upload/v1782608878/Shiroo-1_w3ojbf.jpg", caption: CAPTIONS[0] },
+    { id: 1, imgSrc: "https://res.cloudinary.com/dvf0ugwrr/image/upload/v1782610160/shiroo2_idas2v.jpg", caption: CAPTIONS[1] },
+    { id: 2, imgSrc: "https://res.cloudinary.com/dvf0ugwrr/image/upload/v1782610195/shiroo3_sezmow.jpg", caption: CAPTIONS[2] },
+    { id: 3, imgSrc: "https://res.cloudinary.com/dvf0ugwrr/image/upload/v1782610222/shiroo4_wph4ot.jpg", caption: CAPTIONS[3] },
+    { id: 4, imgSrc: "https://res.cloudinary.com/dvf0ugwrr/image/upload/v1782610275/shiroo5_wisfxi.jpg", caption: CAPTIONS[4] },
+    { id: 5, imgSrc: "https://res.cloudinary.com/dvf0ugwrr/image/upload/v1782610323/shiroo6_fmwgkm.jpg", caption: CAPTIONS[5] },
+  ]);
   const [activeId, setActiveId] = useState<number | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -361,16 +365,11 @@ function GallerySection() {
     reader.readAsDataURL(file);
   };
 
-  const removeImg = (id: number, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setSlots((prev) => prev.map((s) => (s.id === id ? { ...s, imgSrc: null } : s)));
-  };
 
-  const addSlot = () => {
-    const id = nextId;
-    setSlots((prev) => [...prev, { id, imgSrc: null, caption: CAPTIONS[id % CAPTIONS.length] }]);
-    setNextId((n) => n + 1);
-  };
+
+  // Split flat slots array into rows of 3 for honeycomb layout
+  const rows: Slot[][] = [];
+  for (let i = 0; i < slots.length; i += 3) rows.push(slots.slice(i, i + 3));
 
   return (
     <section className="sec">
@@ -378,29 +377,36 @@ function GallerySection() {
       <h2 className="sec-title reveal">Our beautiful pictures 📸(Antha Manchi vi levu anuko)</h2>
       <p className="gallery-note reveal">Click any frame to upload her photo — make it personal 🌷</p>
 
-      <div className="gallery-grid reveal">
-        {slots.map((slot) => (
-          <div
-            key={slot.id}
-            className={`photo-slot${slot.imgSrc ? " has-img" : ""}`}
-            onClick={() => !slot.imgSrc && openPicker(slot.id)}
-          >
-            {slot.imgSrc ? (
-              <>
-                <img src={slot.imgSrc} alt={slot.caption} />
-                <button className="remove-btn" onClick={(e) => removeImg(slot.id, e)} aria-label="Remove photo">✕</button>
-              </>
-            ) : (
-              <>
-                <div className="plus-icon">＋</div>
-                <div className="slot-label">{slot.caption}</div>
-              </>
-            )}
+      <div className="hex-gallery">
+        {rows.map((row, ri) => (
+          <div key={ri} className={`hex-row${ri % 2 === 1 ? " hex-row-offset" : ""}`}>
+            {row.map((slot) => (
+              <div
+                key={slot.id}
+                className={`photo-slot${slot.imgSrc ? " has-img" : ""}`}
+                onClick={() => !slot.imgSrc && openPicker(slot.id)}
+              >
+                {slot.imgSrc ? (
+                  <>
+                    <img src={slot.imgSrc} alt={slot.caption} />
+                    <div className="slot-overlay">
+                      <span className="slot-overlay-caption">{slot.caption}</span>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="upload-icon-wrap">
+                      <span className="upload-icon">📷</span>
+                    </div>
+                    <div className="slot-label">{slot.caption}</div>
+                  </>
+                )}
+              </div>
+            ))}
           </div>
         ))}
       </div>
 
-      <button className="add-slot-btn" onClick={addSlot}>＋ Add another photo frame</button>
       <input type="file" ref={fileRef} accept="image/*" style={{ display: "none" }} onChange={handleChange} />
     </section>
   );
@@ -411,9 +417,13 @@ function GallerySection() {
 ═══════════════════════════════════════════════════ */
 function BirthdayApp() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const polaroidCanvasRef = useRef<HTMLCanvasElement>(null);
   const launch = useLaunchConfetti(canvasRef);
+  const launchPolaroid = useLaunchConfetti(polaroidCanvasRef);
   const [popupDone, setPopupDone] = useState(false);
-  const [polaroidSrc, setPolaroidSrc] = useState<string | null>(null);
+  const [polaroidSrc, setPolaroidSrc] = useState<string | null>(
+    "https://res.cloudinary.com/dvf0ugwrr/image/upload/v1782608878/Shiroo-1_w3ojbf.jpg"
+  );
   const polaroidRef = useRef<HTMLInputElement>(null);
 
   const handlePolaroidChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -439,15 +449,28 @@ function BirthdayApp() {
     return () => { window.removeEventListener("resize", resize); clearTimeout(t); };
   }, [launch]);
 
-  // ── Scroll-reveal observer ─────────────────────────────────────────────────
+  // ── Scroll-reveal observer — always active ────────────────────────────────
   useEffect(() => {
     const io = new IntersectionObserver(
       (entries) => entries.forEach((e) => { if (e.isIntersecting) e.target.classList.add("on"); }),
-      { threshold: 0.1 },
+      { threshold: 0.08 },
     );
     document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
     return () => io.disconnect();
   }, []);
+
+  // ── Force-reveal everything in / above the viewport the moment popup ends ─
+  useEffect(() => {
+    if (!popupDone) return;
+    // Tiny delay so the opacity-1 transition has started before we measure
+    const t = setTimeout(() => {
+      document.querySelectorAll<Element>(".reveal").forEach((el) => {
+        const { top, bottom } = el.getBoundingClientRect();
+        if (bottom > 0 && top < window.innerHeight) el.classList.add("on");
+      });
+    }, 80);
+    return () => clearTimeout(t);
+  }, [popupDone]);
 
   // ── Sparkle cursor ─────────────────────────────────────────────────────────
   useEffect(() => {
@@ -486,161 +509,177 @@ function BirthdayApp() {
       <canvas ref={canvasRef} id="confetti-canvas" />
 
       {/* Best-friend popup chain */}
-      <PopupSystem onConfetti={launch} onComplete={() => setPopupDone(true)} />
+      <PopupSystem onConfetti={launch} onComplete={() => {
+        setPopupDone(true);
+        setTimeout(() => {
+          const cv = polaroidCanvasRef.current;
+          if (cv) { cv.width = cv.offsetWidth; cv.height = cv.offsetHeight; }
+          launchPolaroid(undefined, 140);
+        }, 1600);
+      }} />
 
-      {/* Everything below is invisible until both confirmations are done */}
-      <div style={{ opacity: popupDone ? 1 : 0, pointerEvents: popupDone ? "auto" : "none", transition: "opacity 1.2s ease", userSelect: popupDone ? "auto" : "none" }}>
+      {/* Page content — visible from the start; popup overlays on top */}
+      <div style={{ opacity: 1, transition: "filter 1s ease", filter: popupDone ? "none" : "blur(3px) brightness(0.97)", pointerEvents: popupDone ? "auto" : "none", userSelect: popupDone ? "auto" : "none" }}>
 
-      {/* ── HERO ─────────────────────────────────────────────────────────── */}
-      <div className="hero">
-        {/* Left — existing content */}
-        <div className="hero-left">
-          <p className="hero-eyebrow">✦ a very special day for a very special soul (Athma) ✦</p>
-          <span className="crown">👑</span>
-          <p className="hero-small">Happy Birthday</p>
-          <div className="hero-name">Shiroo</div>
-          <p className="hero-sub">Janamadina Subhakanshalu 🐷</p>
-          <div className="petal-row">🌸 🌷 💜 ✨ 💜 🌷 🌸</div>
-          <div className="scroll-hint">
-            <span>scroll</span>
-            <div className="scroll-bar" />
+        {/* ── HERO ─────────────────────────────────────────────────────────── */}
+        <div className="hero">
+          {/* Left — existing content */}
+          <div className="hero-left">
+            <p className="hero-eyebrow">✦ a very special day for a very special soul (Athma) ✦</p>
+            <span className="crown">👑</span>
+            <p className="hero-small">Happy Birthday</p>
+            <div className="hero-name">Shiroo</div>
+            <p className="hero-sub">Janamadina Subhakanshalu 🐷</p>
+            <div className="petal-row">🌸 🌷 💜 ✨ 💜 🌷 🌸</div>
+            <div className="scroll-hint">
+              <span>scroll</span>
+              <div className="scroll-bar" />
+            </div>
           </div>
-        </div>
 
-        {/* Right — polaroid card + balloons */}
-        <div className="hero-right">
-          <div className="hero-balloons" aria-hidden="true">
-            <span className="hb-balloon hb-b1">🎈</span>
-            <span className="hb-balloon hb-b2">🎈</span>
-            <span className="hb-balloon hb-b3">🎈</span>
-            <span className="hb-balloon hb-b4">🎀</span>
-            <span className="hb-balloon hb-b5">🎈</span>
-          </div>
-          <div className="polaroid-card">
-            <p className="polaroid-heading">Happy Birthday 🐱</p>
-            <div className="polaroid-tape pt-1" aria-hidden="true" />
-            <div className="polaroid-tape pt-2" aria-hidden="true" />
-            <div
-              className="polaroid-frame"
-              role="button"
-              tabIndex={0}
-              aria-label="Click to add a photo"
-              onClick={() => !polaroidSrc && polaroidRef.current?.click()}
-              onKeyDown={(e) => e.key === "Enter" && !polaroidSrc && polaroidRef.current?.click()}
-            >
-              {polaroidSrc ? (
-                <>
+          {/* Right — polaroid card + balloons */}
+          <div className="hero-right">
+            <canvas ref={polaroidCanvasRef} className="polaroid-confetti-canvas" aria-hidden="true" />
+            <div className="hero-balloons" aria-hidden="true">
+              <div className="balloon-wrap hb-b1">
+                <div className="balloon b-rose b-lg" />
+                <svg className="b-string" viewBox="0 0 20 68" fill="none"><path d="M10 0 C17 22 3 44 10 68" stroke="rgba(158,46,80,.32)" strokeWidth="1.8" strokeLinecap="round" /></svg>
+              </div>
+              <div className="balloon-wrap hb-b2">
+                <div className="balloon b-lav b-xl" />
+                <svg className="b-string" viewBox="0 0 20 68" fill="none"><path d="M10 0 C3 24 17 44 10 68" stroke="rgba(106,82,156,.32)" strokeWidth="1.8" strokeLinecap="round" /></svg>
+              </div>
+              <div className="balloon-wrap hb-b3">
+                <div className="balloon b-gold b-sm" />
+                <svg className="b-string" viewBox="0 0 20 68" fill="none"><path d="M10 0 C16 20 5 40 10 68" stroke="rgba(138,106,24,.32)" strokeWidth="1.8" strokeLinecap="round" /></svg>
+              </div>
+              <div className="balloon-wrap hb-b4">
+                <div className="balloon b-pink b-sm" />
+                <svg className="b-string" viewBox="0 0 20 68" fill="none"><path d="M10 0 C4 22 16 42 10 68" stroke="rgba(190,92,124,.32)" strokeWidth="1.8" strokeLinecap="round" /></svg>
+              </div>
+              <div className="balloon-wrap hb-b5">
+                <div className="balloon b-deep b-md" />
+                <svg className="b-string" viewBox="0 0 20 68" fill="none"><path d="M10 0 C15 20 5 44 10 68" stroke="rgba(134,34,56,.32)" strokeWidth="1.8" strokeLinecap="round" /></svg>
+              </div>
+            </div>
+            <div className="polaroid-card">
+              <p className="polaroid-heading">Happy Birthday 🐱</p>
+              <div className="polaroid-tape pt-1" aria-hidden="true" />
+              <div className="polaroid-tape pt-2" aria-hidden="true" />
+              <div
+                className="polaroid-frame"
+                role="button"
+                tabIndex={0}
+                aria-label="Click to add a photo"
+                onClick={() => polaroidRef.current?.click()}
+                onKeyDown={(e) => e.key === "Enter" && polaroidRef.current?.click()}
+              >
+                {polaroidSrc ? (
                   <img src={polaroidSrc} alt="Birthday photo" className="polaroid-img" />
-                  <button
-                    className="polaroid-remove"
-                    aria-label="Remove photo"
-                    onClick={(e) => { e.stopPropagation(); setPolaroidSrc(null); }}
-                  >✕</button>
-                </>
-              ) : (
-                <div className="polaroid-empty">
-                  <span>📸</span>
-                  <span>tap to add a photo</span>
-                </div>
-              )}
+                ) : (
+                  <div className="polaroid-empty">
+                    <span>📸</span>
+                    <span>tap to add a photo</span>
+                  </div>
+                )}
+              </div>
+              <p className="polaroid-caption">To the best human ik... 💙</p>
             </div>
-            <p className="polaroid-caption">To the best human ik... 💙</p>
+            <input
+              ref={polaroidRef}
+              type="file"
+              accept="image/*"
+              style={{ display: "none" }}
+              onChange={handlePolaroidChange}
+            />
           </div>
-          <input
-            ref={polaroidRef}
-            type="file"
-            accept="image/*"
-            style={{ display: "none" }}
-            onChange={handlePolaroidChange}
-          />
         </div>
-      </div>
 
-      <div className="divider"><span className="divider-star">✦</span></div>
+        <div className="divider"><span className="divider-star">✦</span></div>
 
-      {/* ── AGE COUNTER ──────────────────────────────────────────────────── */}
-      <AgeSection />
+        {/* ── AGE COUNTER ──────────────────────────────────────────────────── */}
+        <AgeSection />
 
-      <div className="divider"><span className="divider-star">✦</span></div>
+        <div className="divider"><span className="divider-star">✦</span></div>
 
-      {/* ── HEARTFELT MESSAGE ────────────────────────────────────────────── */}
-      <section className="sec">
-        <span className="sec-label reveal">a little note for you</span>
-        <h2 className="sec-title reveal">From Chinii Babu to her Best Friend 💌</h2>
-        <div className="msg-card reveal">
-          <p className="msg-text">
-            Shiroo Nijm ga chala antey chala thanks raa. Chala baaga support chesthavu. Nuvvu nijm ga chala antey chala manchi pandi vi 🐼
-            . 10th lo kani nuvu help cheyakapoi untey nenu pass aya vadini kadhu . 10th ae kadhu dani taravta kuda chala antey chala help chesavu naku
-            . Andukey nijamga thanks.
-          </p>
-          <p className="msg-text">
-            Manam epudu ki Ellaney undali Best friends laga support cheksovali idariki idarum. Ha Opukunta kullipothanu ani kani
-            nijm ga adi nuvu ekkada durham aipothav ani ae kani vera reason emi ledhu..
-          </p>
-          <p className="msg-text">
-            Epudu Em problem ochina nenu neku support gaa unta . And Yes inko chinna thing manam ni godavalu ayna
-            please ellaney best friends laga kalisi undali anthey naku inka emi odhu
-          </p>
-          <p className="msg-text">
-            I promise to always be there for you, through thick and thin, laughter and tears, highs and lows. May your life be filled with
-            joy, success, and endless happiness. You deserve the world, my dear friend. 🌸✨
-          </p>
-          <p className="msg-sign">— your Chinni Babu, always and forever 💕</p>
-        </div>
-      </section>
+        {/* ── HEARTFELT MESSAGE ────────────────────────────────────────────── */}
+        <section className="sec">
+          <span className="sec-label reveal">a little note for you</span>
+          <h2 className="sec-title reveal">From Chinii Babu to her Best Friend 💌</h2>
+          <div className="msg-card reveal">
+            <p className="msg-text">First Of All Janmadina subhakankshalu Chitti. Epudu Ellaney Happy ga undu Mummy Daddy Chelli ki Baga chusko ❤️
+              Manchi ga job kottavha pacakge chinnadey kani manam kuda inka chinna pillalam ae 22.so ostadi ley kangaru padaku inkoti anukuntav naku peeli aipotadi mari daniki mundhu ae bega setttle avvali ani avtav
+              kanagru em padaku avatv niku manchi  husband ostadu (manchi best friend ellago unnadu ley ) 😅.Antha manchi ga avtadi so don't worry about it.
+            </p>
+            <p className="msg-text">
+              Shiroo Nijm ga chala antey chala thanks raa. Chala baaga support chesthavu. Nuvvu nijm ga chala antey chala manchi pandi vi 🐼
+              . 10th lo kani nuvu help cheyakapoi untey nenu pass aya vadini kadhu . 10th ae kadhu dani taravta kuda chala antey chala help chesavu naku
+              . Andukey nijamga thanks.
+            </p>
+            <p className="msg-text">
+              Manam epudu ki Ellaney undali Best friends laga support cheskovali idariki idarum. Ha Opukunta kullipothanu ani kani
+              nijm ga adi nuvu ekkada durham aipothav ani ae kani vera reason emi ledhu..
+            </p>
+            <p className="msg-text">
+              Epudu Em problem ochina nenu neku support gaa unta . And Yes inko chinna thing manam enni godavalu ayna
+              please ellaney best friends laga kalisi undali anthey naku inka emi odhu
+            </p>
+            <p className="msg-sign">— your Chinni Babu, always and forever 💕</p>
+          </div>
+        </section>
 
-      <div className="divider"><span className="divider-star">✦</span></div>
+        <div className="divider"><span className="divider-star">✦</span></div>
 
-      {/* ── PHOTO GALLERY ────────────────────────────────────────────────── */}
-      <GallerySection />
+        {/* ── PHOTO GALLERY ────────────────────────────────────────────────── */}
+        <GallerySection />
 
-      <div className="divider"><span className="divider-star">✦</span></div>
+        <div className="divider"><span className="divider-star">✦</span></div>
 
-      {/* ── REASONS WE LOVE HER ──────────────────────────────────────────── */}
-      <section className="sec">
-        <span className="sec-label reveal">why she's legendary</span>
-        <h2 className="sec-title reveal">Reasons we love Shiroo 🌷</h2>
-        <div className="reasons-grid">
-          {REASONS.map((r) => (
-            <div key={r.title} className="r-card reveal">
-              <span className="r-emoji">{r.emoji}</span>
-              <div className="r-title">{r.title}</div>
-              <p className="r-desc">{r.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <div className="divider"><span className="divider-star">✦</span></div>
-
-      {/* ── BIRTHDAY WISHES ──────────────────────────────────────────────── */}
-      <section className="sec">
-        <span className="sec-label reveal" style={{ textAlign: "center", display: "block" }}>birthday wishes</span>
-        <h2 className="sec-title reveal" style={{ textAlign: "center" }}>For our princess 👑</h2>
-        <div className="wish-box reveal">
-          <ul className="wish-list">
-            {WISHES.map((w, i) => (
-              <li key={i}><span className="dot" />{w}</li>
+        {/* ── REASONS WE LOVE HER ──────────────────────────────────────────── */}
+        <section className="sec">
+          <span className="sec-label reveal">why she's legendary</span>
+          <h2 className="sec-title reveal">Reasons we love Shiroo 🌷</h2>
+          <div className="reasons-grid">
+            {REASONS.map((r) => (
+              <div key={r.title} className="r-card reveal">
+                <span className="r-emoji">{r.emoji}</span>
+                <div className="r-title">{r.title}</div>
+                <p className="r-desc">{r.desc}</p>
+              </div>
             ))}
-          </ul>
-          <div className="btn-wrap">
-            <div className="btn-ring" />
-            <div className="btn-ring" />
-            <button id="celebrate-btn" className="btn" onClick={() => launch()}>
-              🎉 Celebrate with confetti!
-            </button>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* ── FOOTER ───────────────────────────────────────────────────────── */}
-      <footer className="site-footer">
-        Made with <strong>💕</strong> for <strong>Shiroo</strong> — the most magical girl in every room, always.
-        <br />
-        <span style={{ fontSize: "1.2rem", marginTop: ".75rem", display: "block", letterSpacing: ".25rem", opacity: 0.5 }}>
-          🌸 🌷 💜 ✨ 💜 🌷 🌸
-        </span>
-      </footer>
+        <div className="divider"><span className="divider-star">✦</span></div>
+
+        {/* ── BIRTHDAY WISHES ──────────────────────────────────────────────── */}
+        <section className="sec">
+          <span className="sec-label reveal" style={{ textAlign: "center", display: "block" }}>birthday wishes</span>
+          <h2 className="sec-title reveal" style={{ textAlign: "center" }}>For our princess 👑</h2>
+          <div className="wish-box reveal">
+            <ul className="wish-list">
+              {WISHES.map((w, i) => (
+                <li key={i}><span className="dot" />{w}</li>
+              ))}
+            </ul>
+            <div className="btn-wrap">
+              <div className="btn-ring" />
+              <div className="btn-ring" />
+              <button id="celebrate-btn" className="btn" onClick={() => launch()}>
+                🎉 Celebrate with confetti!
+              </button>
+            </div>
+          </div>
+        </section>
+
+        {/* ── FOOTER ───────────────────────────────────────────────────────── */}
+        <footer className="site-footer">
+          Made with <strong>💕</strong> for <strong>Shiroo</strong> — the most magical girl in every room, always.
+          <br />
+          <span style={{ fontSize: "1.2rem", marginTop: ".75rem", display: "block", letterSpacing: ".25rem", opacity: 0.5 }}>
+            🌸 🌷 💜 ✨ 💜 🌷 🌸
+          </span>
+        </footer>
       </div>{/* /page-content wrapper */}
     </>
   );

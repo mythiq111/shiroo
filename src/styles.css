@@ -66,7 +66,7 @@
 /* ═══════════════════════════════════════════════════
    POPUP SYSTEM
 ═══════════════════════════════════════════════════ */
-.popup-overlay { position: fixed; inset: 0; z-index: 2000; pointer-events: none; }
+.popup-overlay { position: fixed; inset: 0; z-index: 2000; pointer-events: none; background: rgba(248,244,255,.55); backdrop-filter: blur(2px); }
 
 .popup-box {
   position: absolute;
@@ -199,23 +199,86 @@
   position: relative; padding: 4rem 1rem 2rem;
 }
 
-/* Balloons */
+/* ── Realistic CSS Balloons ── */
 .hero-balloons { position: absolute; inset: 0; pointer-events: none; }
-.hb-balloon {
+
+.balloon-wrap {
   position: absolute;
-  font-size: 2.6rem;
-  animation: balloonBob 3.5s ease-in-out infinite;
-  display: block;
-  line-height: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: balloonBob 3.8s ease-in-out infinite;
 }
-.hb-b1 { top: 2%;  left: 12%;  animation-delay: 0s;    font-size: 2.8rem; }
-.hb-b2 { top: 0%;  right: 14%; animation-delay: .7s;   font-size: 3.2rem; }
-.hb-b3 { top: 18%; left: 2%;   animation-delay: 1.4s;  font-size: 2rem; }
-.hb-b4 { top: 8%;  left: 42%;  animation-delay: .3s;   font-size: 1.8rem; }
-.hb-b5 { top: 5%;  right: 2%;  animation-delay: 1s;    font-size: 2.4rem; }
+.hb-b1 { top: 2%;  left: 12%;  animation-delay: 0s;   }
+.hb-b2 { top: 0%;  right: 14%; animation-delay: .7s;  }
+.hb-b3 { top: 18%; left: 2%;   animation-delay: 1.4s; }
+.hb-b4 { top: 8%;  left: 42%;  animation-delay: .3s;  }
+.hb-b5 { top: 5%;  right: 2%;  animation-delay: 1s;   }
+
+/* Balloon body */
+.balloon {
+  width: 60px;
+  height: 74px;
+  border-radius: 50% 50% 50% 50% / 44% 44% 56% 56%;
+  position: relative;
+  filter: drop-shadow(2px 6px 12px rgba(0,0,0,.22));
+}
+
+/* Size variants */
+.b-sm { width: 46px; height: 57px; }
+.b-md { width: 58px; height: 71px; }
+.b-lg { width: 66px; height: 80px; }
+.b-xl { width: 74px; height: 90px; }
+
+/* Specular shine */
+.balloon::before {
+  content: '';
+  position: absolute;
+  top: 14%; left: 18%;
+  width: 32%; height: 24%;
+  background: radial-gradient(ellipse, rgba(255,255,255,.78) 0%, transparent 70%);
+  border-radius: 50%;
+  transform: rotate(-28deg);
+  pointer-events: none;
+}
+
+/* Knot at bottom */
+.balloon::after {
+  content: '';
+  position: absolute;
+  bottom: -7px; left: 50%;
+  transform: translateX(-50%);
+  width: 9px; height: 10px;
+  border-radius: 40% 40% 50% 50%;
+}
+
+/* Color variants */
+.b-rose { background: radial-gradient(ellipse at 38% 28%, #f6b4c4 0%, #d4687c 48%, #9e2e50 100%); }
+.b-rose::after { background: #9e2e50; }
+
+.b-lav  { background: radial-gradient(ellipse at 38% 28%, #cfc0e8 0%, #9b84c4 48%, #6a529c 100%); }
+.b-lav::after  { background: #6a529c; }
+
+.b-gold { background: radial-gradient(ellipse at 38% 28%, #eacf7a 0%, #c49a3c 48%, #8a6a18 100%); }
+.b-gold::after { background: #8a6a18; }
+
+.b-pink { background: radial-gradient(ellipse at 38% 28%, #fad4e2 0%, #e890aa 48%, #be5c7c 100%); }
+.b-pink::after { background: #be5c7c; }
+
+.b-deep { background: radial-gradient(ellipse at 38% 28%, #dc7c96 0%, #b84f63 48%, #862238 100%); }
+.b-deep::after { background: #862238; }
+
+/* Wavy string */
+.b-string {
+  width: 22px; height: 68px;
+  margin-top: 1px;
+  display: block;
+  overflow: visible;
+}
+
 @keyframes balloonBob {
-  0%,100% { transform: translateY(0) rotate(-4deg); }
-  50%      { transform: translateY(-14px) rotate(4deg); }
+  0%,100% { transform: translateY(0)    rotate(-3deg); }
+  50%      { transform: translateY(-18px) rotate(3deg); }
 }
 
 /* Polaroid card */
@@ -288,6 +351,16 @@
   font-family: var(--font-serif);
   font-size: .88rem; color: #6b4a75;
   text-align: right; font-style: italic; font-weight: 300;
+}
+
+/* ── Confetti canvas covering the hero-right area (random scatter) ── */
+.polaroid-confetti-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 30;
 }
 
 /* ═══════════════════════════════════════════════════
@@ -378,43 +451,146 @@
 .msg-sign { margin-top: 1.8rem; font-family: var(--font-serif); font-style: italic; color: var(--rose); font-size: 1rem; text-align: right; }
 
 /* ═══════════════════════════════════════════════════
-   GALLERY
+   GALLERY — Honeycomb Hexagon Layout
 ═══════════════════════════════════════════════════ */
-.gallery-note { font-size: .82rem; color: var(--muted); font-weight: 300; margin-bottom: 1.4rem; }
-.gallery-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 1rem; }
-@media (max-width: 560px) { .gallery-grid { grid-template-columns: repeat(2,1fr); } }
+.gallery-note { font-size: .82rem; color: var(--muted); font-weight: 300; margin-bottom: 2.2rem; }
 
+/* ── Hex grid container ── */
+.hex-gallery {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 1.8rem;
+}
+
+.hex-row { display: flex; gap: 18px; }
+
+/* Offset every other row — reduced overlap adds visible gap between rows */
+.hex-row-offset {
+  margin-top: -36px;       /* less than perfect honeycomb = visible row gap */
+  margin-left: 103px;      /* (188px + 18px gap) / 2 */
+}
+
+/* ── Hex slot base ── */
 .photo-slot {
-  aspect-ratio: 1; border-radius: 14px; overflow: hidden;
-  border: 1.5px dashed rgba(155,132,196,.3);
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .4rem;
-  cursor: pointer; position: relative; background: var(--lav-pale);
-  transition: border-color .25s, background .25s, transform .25s;
+  width: 188px;
+  height: 217px;           /* 188 * 1.1547 for regular hex proportions */
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .55rem;
+  cursor: pointer; position: relative; overflow: hidden;
+  background: linear-gradient(160deg, rgba(155,132,196,.14) 0%, rgba(212,104,124,.09) 55%, rgba(155,132,196,.12) 100%);
+  transition: transform .38s cubic-bezier(.34,1.56,.64,1), filter .38s;
+  filter: drop-shadow(0 3px 10px rgba(155,132,196,.18));
 }
-.photo-slot:hover { border-color: var(--lav); background: rgba(155,132,196,.1); transform: scale(1.02); }
+
+/* Animated shimmer sweep on empty slots */
+.photo-slot:not(.has-img)::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(110deg, transparent 25%, rgba(255,255,255,.1) 50%, transparent 75%);
+  background-size: 220% 100%;
+  animation: gallery-shimmer 3s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes gallery-shimmer {
+  0%   { background-position: -220% 0; }
+  100% { background-position: 220% 0; }
+}
+
+.photo-slot:not(.has-img):hover {
+  transform: translateY(-7px) scale(1.06);
+  filter: drop-shadow(0 14px 28px rgba(155,132,196,.38)) drop-shadow(0 0 1px rgba(155,132,196,.5));
+  background: linear-gradient(160deg, rgba(155,132,196,.22) 0%, rgba(212,104,124,.15) 55%, rgba(155,132,196,.2) 100%);
+}
+
 .photo-slot.has-img { cursor: default; }
+.photo-slot.has-img:hover {
+  transform: translateY(-7px) scale(1.06);
+  filter: drop-shadow(0 16px 32px rgba(0,0,0,.28));
+}
 
-.photo-slot img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 13px; }
-.plus-icon  { font-size: 1.6rem; color: rgba(155,132,196,.45); transition: color .2s; pointer-events: none; }
-.photo-slot:hover .plus-icon { color: var(--lav); }
-.slot-label { font-size: .63rem; color: var(--soft); letter-spacing: .05em; text-align: center; padding: 0 .4rem; pointer-events: none; }
+/* ── Image fill ── */
+.photo-slot img {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover;
+  transition: transform .5s ease;
+}
+.photo-slot.has-img:hover img { transform: scale(1.1); }
 
+/* ── Caption overlay (shows on hover for filled slots) ── */
+.slot-overlay {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 1.6rem .75rem .85rem;
+  background: linear-gradient(to top, rgba(8,4,18,.7) 0%, transparent 100%);
+  display: flex; align-items: flex-end; justify-content: center;
+  opacity: 0; transition: opacity .3s ease;
+  z-index: 3;
+}
+.photo-slot.has-img:hover .slot-overlay { opacity: 1; }
+.slot-overlay-caption {
+  font-size: .6rem; color: rgba(255,255,255,.94);
+  letter-spacing: .08em; text-transform: uppercase; font-weight: 500; text-align: center;
+}
+
+/* ── Upload icon (empty state) ── */
+.upload-icon-wrap {
+  width: 44px; height: 44px; border-radius: 13px;
+  background: rgba(155,132,196,.16);
+  border: 1px solid rgba(155,132,196,.22);
+  display: flex; align-items: center; justify-content: center;
+  transition: transform .3s, background .3s;
+}
+.upload-icon { font-size: 1.35rem; line-height: 1; display: block; }
+.photo-slot:not(.has-img):hover .upload-icon-wrap {
+  background: rgba(155,132,196,.28);
+  transform: scale(1.14);
+}
+
+.slot-label {
+  font-size: .55rem; color: rgba(155,132,196,.6);
+  letter-spacing: .1em; text-transform: uppercase; text-align: center;
+  padding: 0 .5rem; pointer-events: none; max-width: 120px;
+}
+
+/* ── Remove button — positioned inside the visible hex area ── */
 .remove-btn {
-  position: absolute; top: 6px; right: 6px;
-  background: rgba(0,0,0,.35); border: none; color: #fff;
-  border-radius: 50%; width: 24px; height: 24px; font-size: .65rem;
-  cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 5;
-  transition: background .2s;
+  position: absolute; top: 30%; right: 10px;
+  background: rgba(0,0,0,.5); backdrop-filter: blur(6px);
+  border: 1px solid rgba(255,255,255,.15); color: rgba(255,255,255,.9);
+  border-radius: 50%; width: 26px; height: 26px; font-size: .6rem;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  z-index: 5; transition: background .2s, transform .2s;
 }
-.remove-btn:hover { background: rgba(0,0,0,.55); }
+.remove-btn:hover { background: rgba(180,60,80,.75); transform: scale(1.12); }
 
+/* ── Add-slot button ── */
 .add-slot-btn {
-  width: 100%; padding: .72rem; border-radius: 12px;
+  width: 100%; padding: .9rem; border-radius: 18px;
   border: 1.5px dashed rgba(155,132,196,.25);
-  background: transparent; color: var(--muted); font-size: .8rem; font-family: var(--font-sans);
-  cursor: pointer; transition: all .2s; letter-spacing: .04em; margin-top: 2px;
+  background: transparent; color: rgba(155,132,196,.45);
+  font-size: .78rem; font-family: var(--font-sans);
+  cursor: pointer; transition: all .3s; letter-spacing: .08em;
+  margin-top: .5rem; display: flex; align-items: center; justify-content: center; gap: .5rem;
+  text-transform: uppercase;
 }
-.add-slot-btn:hover { border-color: var(--lav); color: var(--lav); background: var(--lav-pale); }
+.add-slot-btn:hover {
+  border-color: rgba(155,132,196,.55); color: var(--lav);
+  background: rgba(155,132,196,.06);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(155,132,196,.1);
+}
+
+/* ── Responsive ── */
+@media (max-width: 620px) {
+  .photo-slot { width: 106px; height: 122px; }
+  .hex-row { gap: 10px; }
+  .hex-row-offset { margin-top: -20px; margin-left: 58px; }
+  .upload-icon-wrap { width: 32px; height: 32px; border-radius: 9px; }
+  .upload-icon { font-size: 1rem; }
+  .slot-label { font-size: .48rem; }
+  .remove-btn { width: 22px; height: 22px; font-size: .5rem; top: 28%; right: 6px; }
+}
 
 /* ═══════════════════════════════════════════════════
    REASONS GRID

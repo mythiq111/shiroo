@@ -518,8 +518,8 @@ function BirthdayApp() {
         }, 1600);
       }} />
 
-      {/* Page content — visible from the start; popup overlays on top */}
-      <div style={{ opacity: 1, transition: "filter 1s ease", filter: popupDone ? "none" : "blur(3px) brightness(0.97)", pointerEvents: popupDone ? "auto" : "none", userSelect: popupDone ? "auto" : "none" }}>
+      {/* Everything below is invisible until both confirmations are done */}
+      <div style={{ opacity: popupDone ? 1 : 0, pointerEvents: popupDone ? "auto" : "none", transition: "opacity 1.2s ease", userSelect: popupDone ? "auto" : "none" }}>
 
         {/* ── HERO ─────────────────────────────────────────────────────────── */}
         <div className="hero">

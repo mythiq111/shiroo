@@ -66,7 +66,7 @@
 /* ═══════════════════════════════════════════════════
    POPUP SYSTEM
 ═══════════════════════════════════════════════════ */
-.popup-overlay { position: fixed; inset: 0; z-index: 2000; pointer-events: none; background: rgba(248,244,255,.55); backdrop-filter: blur(2px); }
+.popup-overlay { position: fixed; inset: 0; z-index: 2000; pointer-events: none; }
 
 .popup-box {
   position: absolute;

@@ -32,7 +32,7 @@ function calcAge() {
 
 const CAPTIONS = [
   "Bestie moments ✨", "Pure joy 🌸", "My fav human 💜",
-  "We ate that 😂", "Iconic 👑", "Forever fav 🌷",
+  "Making Ur Mom Proud", "Iconic 👑", "Forever fav 🌷",
   "Main characters 🎀", "Love her 💕", "Our vibes ✨", "Memories 🎀",
 ];
 
@@ -93,9 +93,6 @@ const NO_TEXTS = [
 ];
 
 const CONFETTI_COLS = ["#d4687c", "#9b84c4", "#c49a3c", "#f5c6d0", "#cfc0e8", "#e8cc8a", "#b84f63", "#7a63a8"];
-const SPARKLE_CHARS = ["✦", "✧", "⋆", "◇", "✿", "·", "*"];
-const SPARKLE_COLS = ["#d4687c", "#9b84c4", "#c49a3c", "rgba(155,132,196,.7)"];
-const FLOATIE_CHARS = ["🌸", "🌷", "✨", "💜", "🩷", "⋆", "·"];
 
 /* ═══════════════════════════════════════════════════
    CONFETTI HOOK
@@ -285,7 +282,6 @@ function PopupSystem({ onConfetti, onComplete }: PopupProps) {
             : "none",
         }}
       >
-        <div className="popup-sparkle">✦</div>
         <span className="popup-emoji">{data.emoji}</span>
         <div className="popup-title">{data.title}</div>
         <div className="popup-sub">{data.sub}</div>
@@ -338,15 +334,26 @@ function AgeSection() {
 ═══════════════════════════════════════════════════ */
 type Slot = { id: number; imgSrc: string | null; caption: string };
 
+const GALLERY_ROTATIONS = [-3, 2, -2, 3, -1.5, 2.5];
+
+function shuffle<T>(arr: T[]): T[] {
+  const out = [...arr];
+  for (let i = out.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [out[i], out[j]] = [out[j], out[i]];
+  }
+  return out;
+}
+
 function GallerySection() {
-  const [slots, setSlots] = useState<Slot[]>(() => [
+  const [slots, setSlots] = useState<Slot[]>(() => shuffle([
     { id: 0, imgSrc: "https://res.cloudinary.com/dvf0ugwrr/image/upload/v1782608878/Shiroo-1_w3ojbf.jpg", caption: CAPTIONS[0] },
     { id: 1, imgSrc: "https://res.cloudinary.com/dvf0ugwrr/image/upload/v1782610160/shiroo2_idas2v.jpg", caption: CAPTIONS[1] },
     { id: 2, imgSrc: "https://res.cloudinary.com/dvf0ugwrr/image/upload/v1782610195/shiroo3_sezmow.jpg", caption: CAPTIONS[2] },
     { id: 3, imgSrc: "https://res.cloudinary.com/dvf0ugwrr/image/upload/v1782610222/shiroo4_wph4ot.jpg", caption: CAPTIONS[3] },
     { id: 4, imgSrc: "https://res.cloudinary.com/dvf0ugwrr/image/upload/v1782610275/shiroo5_wisfxi.jpg", caption: CAPTIONS[4] },
     { id: 5, imgSrc: "https://res.cloudinary.com/dvf0ugwrr/image/upload/v1782610323/shiroo6_fmwgkm.jpg", caption: CAPTIONS[5] },
-  ]);
+  ]));
   const [activeId, setActiveId] = useState<number | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -365,44 +372,34 @@ function GallerySection() {
     reader.readAsDataURL(file);
   };
 
-
-
-  // Split flat slots array into rows of 3 for honeycomb layout
-  const rows: Slot[][] = [];
-  for (let i = 0; i < slots.length; i += 3) rows.push(slots.slice(i, i + 3));
-
   return (
     <section className="sec">
       <span className="sec-label reveal">memories &amp; moments</span>
       <h2 className="sec-title reveal">Our beautiful pictures 📸(Antha Manchi vi levu anuko)</h2>
-      <p className="gallery-note reveal">Click any frame to upload her photo — make it personal 🌷</p>
 
-      <div className="hex-gallery">
-        {rows.map((row, ri) => (
-          <div key={ri} className={`hex-row${ri % 2 === 1 ? " hex-row-offset" : ""}`}>
-            {row.map((slot) => (
-              <div
-                key={slot.id}
-                className={`photo-slot${slot.imgSrc ? " has-img" : ""}`}
-                onClick={() => !slot.imgSrc && openPicker(slot.id)}
-              >
-                {slot.imgSrc ? (
-                  <>
-                    <img src={slot.imgSrc} alt={slot.caption} />
-                    <div className="slot-overlay">
-                      <span className="slot-overlay-caption">{slot.caption}</span>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <div className="upload-icon-wrap">
-                      <span className="upload-icon">📷</span>
-                    </div>
-                    <div className="slot-label">{slot.caption}</div>
-                  </>
-                )}
-              </div>
-            ))}
+      <div className="gallery-grid reveal">
+        {slots.map((slot, i) => (
+          <div
+            key={slot.id}
+            className={`photo-card${slot.imgSrc ? " has-img" : ""}`}
+            style={{ "--tilt": `${GALLERY_ROTATIONS[i % GALLERY_ROTATIONS.length]}deg` } as React.CSSProperties}
+            onClick={() => !slot.imgSrc && openPicker(slot.id)}
+          >
+            {slot.imgSrc ? (
+              <>
+                <img src={slot.imgSrc} alt={slot.caption} />
+                <div className="photo-overlay">
+                  <span className="photo-overlay-caption">{slot.caption}</span>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="upload-icon-wrap">
+                  <span className="upload-icon">📷</span>
+                </div>
+                <div className="photo-label">{slot.caption}</div>
+              </>
+            )}
           </div>
         ))}
       </div>
@@ -472,37 +469,6 @@ function BirthdayApp() {
     return () => clearTimeout(t);
   }, [popupDone]);
 
-  // ── Sparkle cursor ─────────────────────────────────────────────────────────
-  useEffect(() => {
-    let lastSp = 0;
-    const handleMove = (e: MouseEvent) => {
-      const now = Date.now();
-      if (now - lastSp < 95) return;
-      lastSp = now;
-      const el = document.createElement("div");
-      el.className = "sparkle";
-      el.textContent = SPARKLE_CHARS[Math.floor(Math.random() * SPARKLE_CHARS.length)];
-      el.style.cssText = `left:${e.clientX + (Math.random() * 16 - 8)}px;top:${e.clientY + (Math.random() * 16 - 8)}px;color:${SPARKLE_COLS[Math.floor(Math.random() * SPARKLE_COLS.length)]};`;
-      document.body.appendChild(el);
-      setTimeout(() => el.remove(), 700);
-    };
-    document.addEventListener("mousemove", handleMove);
-    return () => document.removeEventListener("mousemove", handleMove);
-  }, []);
-
-  // ── Floating emoji particles ───────────────────────────────────────────────
-  useEffect(() => {
-    const id = setInterval(() => {
-      const f = document.createElement("div");
-      f.className = "floatie";
-      f.textContent = FLOATIE_CHARS[Math.floor(Math.random() * FLOATIE_CHARS.length)];
-      f.style.cssText = `left:${Math.random() * 94}%;font-size:${0.65 + Math.random() * 0.9}rem;animation-duration:${5 + Math.random() * 4}s`;
-      document.body.appendChild(f);
-      setTimeout(() => f.remove(), 9000);
-    }, 2400);
-    return () => clearInterval(id);
-  }, []);
-
   return (
     <>
       {/* Confetti canvas */}
@@ -525,66 +491,71 @@ function BirthdayApp() {
         <div className="hero">
           {/* Left — existing content */}
           <div className="hero-left">
-            <p className="hero-eyebrow">✦ a very special day for a very special soul (Athma) ✦</p>
+            <p className="hero-eyebrow">a very special day for a very special soul (Athma)</p>
             <span className="crown">👑</span>
             <p className="hero-small">Happy Birthday</p>
             <div className="hero-name">Shiroo</div>
             <p className="hero-sub">Janamadina Subhakanshalu 🐷</p>
-            <div className="petal-row">🌸 🌷 💜 ✨ 💜 🌷 🌸</div>
+            <div className="hero-stats">
+              <span className="hero-stat">21 years</span>
+              <span className="hero-stat">best friends</span>
+              <span className="hero-stat">forever ♾</span>
+            </div>
             <div className="scroll-hint">
               <span>scroll</span>
               <div className="scroll-bar" />
             </div>
           </div>
 
-          {/* Right — polaroid card + balloons */}
+          {/* Right — photo collage + balloons */}
           <div className="hero-right">
             <canvas ref={polaroidCanvasRef} className="polaroid-confetti-canvas" aria-hidden="true" />
             <div className="hero-balloons" aria-hidden="true">
               <div className="balloon-wrap hb-b1">
-                <div className="balloon b-rose b-lg" />
-                <svg className="b-string" viewBox="0 0 20 68" fill="none"><path d="M10 0 C17 22 3 44 10 68" stroke="rgba(158,46,80,.32)" strokeWidth="1.8" strokeLinecap="round" /></svg>
+                <div className="balloon b-lav-a b-md" />
+                <svg className="b-string" viewBox="0 0 20 68" fill="none"><path d="M10 0 C17 22 3 44 10 68" stroke="rgba(122,99,168,.28)" strokeWidth="1.5" strokeLinecap="round" /></svg>
               </div>
               <div className="balloon-wrap hb-b2">
-                <div className="balloon b-lav b-xl" />
-                <svg className="b-string" viewBox="0 0 20 68" fill="none"><path d="M10 0 C3 24 17 44 10 68" stroke="rgba(106,82,156,.32)" strokeWidth="1.8" strokeLinecap="round" /></svg>
-              </div>
-              <div className="balloon-wrap hb-b3">
-                <div className="balloon b-gold b-sm" />
-                <svg className="b-string" viewBox="0 0 20 68" fill="none"><path d="M10 0 C16 20 5 40 10 68" stroke="rgba(138,106,24,.32)" strokeWidth="1.8" strokeLinecap="round" /></svg>
-              </div>
-              <div className="balloon-wrap hb-b4">
-                <div className="balloon b-pink b-sm" />
-                <svg className="b-string" viewBox="0 0 20 68" fill="none"><path d="M10 0 C4 22 16 42 10 68" stroke="rgba(190,92,124,.32)" strokeWidth="1.8" strokeLinecap="round" /></svg>
-              </div>
-              <div className="balloon-wrap hb-b5">
-                <div className="balloon b-deep b-md" />
-                <svg className="b-string" viewBox="0 0 20 68" fill="none"><path d="M10 0 C15 20 5 44 10 68" stroke="rgba(134,34,56,.32)" strokeWidth="1.8" strokeLinecap="round" /></svg>
+                <div className="balloon b-lav b-lg" />
+                <svg className="b-string" viewBox="0 0 20 68" fill="none"><path d="M10 0 C3 24 17 44 10 68" stroke="rgba(106,82,156,.28)" strokeWidth="1.5" strokeLinecap="round" /></svg>
               </div>
             </div>
-            <div className="polaroid-card">
-              <p className="polaroid-heading">Happy Birthday 🐱</p>
-              <div className="polaroid-tape pt-1" aria-hidden="true" />
-              <div className="polaroid-tape pt-2" aria-hidden="true" />
-              <div
-                className="polaroid-frame"
-                role="button"
-                tabIndex={0}
-                aria-label="Click to add a photo"
-                onClick={() => polaroidRef.current?.click()}
-                onKeyDown={(e) => e.key === "Enter" && polaroidRef.current?.click()}
-              >
-                {polaroidSrc ? (
-                  <img src={polaroidSrc} alt="Birthday photo" className="polaroid-img" />
-                ) : (
-                  <div className="polaroid-empty">
-                    <span>📸</span>
-                    <span>tap to add a photo</span>
-                  </div>
-                )}
+
+            <span className="hero-sparkle spk-1" aria-hidden="true">✦</span>
+            <span className="hero-sparkle spk-2" aria-hidden="true">✧</span>
+            <span className="hero-sparkle spk-3" aria-hidden="true">✦</span>
+
+            <div className="photo-stack">
+              <div className="deco-photo deco-photo-1" aria-hidden="true">
+                <img src="https://res.cloudinary.com/dvf0ugwrr/image/upload/v1782610160/shiroo2_idas2v.jpg" alt="" />
               </div>
-              <p className="polaroid-caption">To the best human ik... 💙</p>
+              <div className="deco-photo deco-photo-2" aria-hidden="true">
+                <img src="https://res.cloudinary.com/dvf0ugwrr/image/upload/v1782610195/shiroo3_sezmow.jpg" alt="" />
+              </div>
+
+              <div className="polaroid-card">
+                <p className="polaroid-heading">Happy Birthday 🐱</p>
+                <div
+                  className="polaroid-frame"
+                  role="button"
+                  tabIndex={0}
+                  aria-label="Click to add a photo"
+                  onClick={() => polaroidRef.current?.click()}
+                  onKeyDown={(e) => e.key === "Enter" && polaroidRef.current?.click()}
+                >
+                  {polaroidSrc ? (
+                    <img src={polaroidSrc} alt="Birthday photo" className="polaroid-img" />
+                  ) : (
+                    <div className="polaroid-empty">
+                      <span>📸</span>
+                      <span>tap to add a photo</span>
+                    </div>
+                  )}
+                </div>
+                <p className="polaroid-caption">To the best human ik... 💙</p>
+              </div>
             </div>
+
             <input
               ref={polaroidRef}
               type="file"
@@ -595,12 +566,12 @@ function BirthdayApp() {
           </div>
         </div>
 
-        <div className="divider"><span className="divider-star">✦</span></div>
+        <div className="divider" />
 
         {/* ── AGE COUNTER ──────────────────────────────────────────────────── */}
         <AgeSection />
 
-        <div className="divider"><span className="divider-star">✦</span></div>
+        <div className="divider" />
 
         {/* ── HEARTFELT MESSAGE ────────────────────────────────────────────── */}
         <section className="sec">
@@ -629,12 +600,12 @@ function BirthdayApp() {
           </div>
         </section>
 
-        <div className="divider"><span className="divider-star">✦</span></div>
+        <div className="divider" />
 
         {/* ── PHOTO GALLERY ────────────────────────────────────────────────── */}
         <GallerySection />
 
-        <div className="divider"><span className="divider-star">✦</span></div>
+        <div className="divider" />
 
         {/* ── REASONS WE LOVE HER ──────────────────────────────────────────── */}
         <section className="sec">
@@ -651,7 +622,7 @@ function BirthdayApp() {
           </div>
         </section>
 
-        <div className="divider"><span className="divider-star">✦</span></div>
+        <div className="divider" />
 
         {/* ── BIRTHDAY WISHES ──────────────────────────────────────────────── */}
         <section className="sec">

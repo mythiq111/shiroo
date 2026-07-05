@@ -608,7 +608,7 @@ function BirthdayApp() {
           <h2 className="sec-title reveal">From Chinii Babu to her Best Friend 💌</h2>
           <div className="msg-card reveal">
             <p className="msg-text">First Of All Janmadina subhakankshalu Chitti. Epudu Ellaney Happy ga undu Mummy Daddy Chelli ki Baga chusko ❤️
-              Manchi ga job kottavha pacakge chinnadey kani manam kuda inka chinna pillalam ae 22.so ostadi ley kangaru padaku inkoti anukuntav naku peeli aipotadi mari daniki mundhu ae bega setttle avvali ani avtav
+              Manchi ga job kottavga pacakge chinnadey kani manam kuda inka chinna pillalam ae 22.so ostadi ley kangaru padaku inkoti anukuntav naku peeli aipotadi mari daniki mundhu ae bega setttle avvali ani avtav
               kanagru em padaku avatv niku manchi  husband ostadu (manchi best friend ellago unnadu ley ) 😅.Antha manchi ga avtadi so don't worry about it.
             </p>
             <p className="msg-text">
@@ -621,8 +621,9 @@ function BirthdayApp() {
               nijm ga adi nuvu ekkada durham aipothav ani ae kani vera reason emi ledhu..
             </p>
             <p className="msg-text">
-              Epudu Em problem ochina nenu neku support gaa unta . And Yes inko chinna thing manam enni godavalu ayna
-              please ellaney best friends laga kalisi undali anthey naku inka emi odhu
+              Epudu Em problem ochina nenu neku support gaa untanu .Naku ma parents Entho me parents kuda anthey vallani kuda epudu ma mummy dollu lagey equal ga chusa .
+              And Yes inko chinna thing manam enni godavalu ayna
+              please ellaney best friends laga kalisi undali anthey naku inka emi odhu.
             </p>
             <p className="msg-sign">— your Chinni Babu, always and forever 💕</p>
           </div>

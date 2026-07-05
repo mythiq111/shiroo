@@ -417,6 +417,7 @@ function BirthdayApp() {
   const polaroidCanvasRef = useRef<HTMLCanvasElement>(null);
   const launch = useLaunchConfetti(canvasRef);
   const launchPolaroid = useLaunchConfetti(polaroidCanvasRef);
+  const [wishes] = useState(() => shuffle(WISHES));
   const [popupDone, setPopupDone] = useState(false);
   const [polaroidSrc, setPolaroidSrc] = useState<string | null>(
     "https://res.cloudinary.com/dvf0ugwrr/image/upload/v1782608878/Shiroo-1_w3ojbf.jpg"
@@ -630,7 +631,7 @@ function BirthdayApp() {
           <h2 className="sec-title reveal" style={{ textAlign: "center" }}>For our princess 👑</h2>
           <div className="wish-box reveal">
             <ul className="wish-list">
-              {WISHES.map((w, i) => (
+              {wishes.map((w, i) => (
                 <li key={i}><span className="dot" />{w}</li>
               ))}
             </ul>

@@ -54,6 +54,16 @@ const WISHES = [
   "May you always choose yourself first, princess 💕",
 ];
 
+// Fixed, non-overlapping scatter positions (percent of the wish-scatter box) + a slight tilt
+const WISH_SLOTS = [
+  { x: 20, y: 14, r: -3 },
+  { x: 66, y: 12, r: 2.5 },
+  { x: 40, y: 42, r: -2 },
+  { x: 82, y: 50, r: 3 },
+  { x: 16, y: 74, r: 2 },
+  { x: 62, y: 82, r: -3 },
+];
+
 const POPUP_DATA = {
   1: { emoji: "🌸", title: "Will you be my best friend?", sub: "I really, really need to know 🥺", btn: "Yes, always! 💕" },
   2: { emoji: "🤞", title: "Do you promise?", sub: "Pinky swear? Like, forever and ever? 💜", btn: "I Promise! 🌸" },
@@ -628,13 +638,22 @@ function BirthdayApp() {
         {/* ── BIRTHDAY WISHES ──────────────────────────────────────────────── */}
         <section className="sec">
           <span className="sec-label reveal" style={{ textAlign: "center", display: "block" }}>birthday wishes</span>
-          <h2 className="sec-title reveal" style={{ textAlign: "center" }}>For our princess 👑</h2>
+          <h2 className="sec-title reveal" style={{ textAlign: "center" }}>For our pandi princess 🐷👑</h2>
           <div className="wish-box reveal">
-            <ul className="wish-list">
-              {wishes.map((w, i) => (
-                <li key={i}><span className="dot" />{w}</li>
-              ))}
-            </ul>
+            <div className="wish-scatter">
+              {wishes.map((w, i) => {
+                const slot = WISH_SLOTS[i % WISH_SLOTS.length];
+                return (
+                  <div
+                    key={w}
+                    className="wish-note"
+                    style={{ "--wx": `${slot.x}%`, "--wy": `${slot.y}%`, "--wr": `${slot.r}deg` } as React.CSSProperties}
+                  >
+                    <span className="dot" />{w}
+                  </div>
+                );
+              })}
+            </div>
             <div className="btn-wrap">
               <div className="btn-ring" />
               <div className="btn-ring" />
